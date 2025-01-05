@@ -132,8 +132,13 @@
                 <div
                   v-for="(color, index) in sneaker.colors"
                   :key="index"
-                  class="mt-4 flex items-center space-x-4"
+                  class="mt-4 -mr-7 flex items-center space-x-4"
                 >
+                  <input
+                    v-model="color.hex"
+                    type="color"
+                    class="block w-16 h-10 border border-gray-300 rounded-md px-2 p-1 cursor-pointer"
+                  />
                   <input
                     v-model="color.name"
                     type="text"
@@ -143,7 +148,7 @@
                   <button
                     @click="removeColor(index)"
                     type="button"
-                    class="relative right-7 bottom-4 h-5 w-6 flex items-center justify-center cursor-pointer rounded-full bg-red-600 transition text-white hover:bg-red-500"
+                    class="relative right-8 bottom-4 min-h-5 min-w-5 flex items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-500"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -151,7 +156,7 @@
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
-                      class="size-5"
+                      class="w-4 h-4"
                     >
                       <path
                         stroke-linecap="round"
@@ -170,7 +175,6 @@
                 + Add
               </button>
             </div>
-
             <!-- Size Options -->
             <div class="col-span-full">
               <h3 class="block text-sm font-medium text-gray-900">Sizes</h3>
@@ -203,7 +207,7 @@
                   <button
                     @click="removeSize(index)"
                     type="button"
-                    class="relative right-20 bottom-4 h-5 w-6 flex items-center justify-center cursor-pointer rounded-full bg-red-600 transition text-white hover:bg-red-500"
+                    class="relative right-20 bottom-4 min-h-5 min-w-5 flex items-center justify-center cursor-pointer rounded-full bg-red-600 transition text-white hover:bg-red-500"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +215,7 @@
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
-                      class="size-5"
+                      class="w-4 h-4"
                     >
                       <path
                         stroke-linecap="round"
