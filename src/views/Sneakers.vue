@@ -29,12 +29,12 @@
               SALE
             </div>
           </div>
-
           <img
-            :src="product.imageSrc"
+            :src="imageUrl + product.image"
             :alt="product.imageAlt"
             class="aspect-square w-full p-12 rounded-md bg-gray-200 object-contain group-hover:opacity-75 lg:aspect-auto lg:h-80"
           />
+
           <div class="mt-4 flex justify-between">
             <div>
               <h3 class="text-sm text-gray-700">
@@ -44,20 +44,26 @@
                 </router-link>
               </h3>
               <p class="mt-1 text-sm text-gray-500">{{ product.brand }}</p>
-              <p class="mt-1 text-xs text-gray-500">{{ product.color }}</p>
+              <div
+                class="flex w-full text-sm"
+                v-for="color in product.colors"
+                :key="color"
+              >
+                <p class="flex items-center">{{ color }}</p>
+              </div>
             </div>
             <div class="text-right">
               <p
                 v-if="product.onSale"
                 class="text-xs text-gray-500 line-through"
               >
-                {{ product.originalPrice }}
+                {{ product.originalPrice }} $
               </p>
               <p
                 class="text-sm font-medium"
                 :class="product.onSale ? 'text-red-600' : 'text-gray-900'"
               >
-                {{ product.price }}
+                {{ product.price }} $
               </p>
             </div>
           </div>
@@ -66,107 +72,36 @@
     </div>
   </div>
 </template>
-
 <script setup>
-const products = [
-  {
-    id: 1,
-    name: 'TRAVIS SCOTT AJ1 FOR MEN',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-72.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$150',
-    originalPrice: '$200',
-    color: 'White/University Red',
-    onSale: true,
-  },
-  {
-    id: 5,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-5.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: true,
-  },
-  {
-    id: 6,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-6.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: false,
-  },
-  {
-    id: 7,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-7.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: false,
-  },
-  {
-    id: 8,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-8.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: false,
-  },
-  {
-    id: 9,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-4.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: false,
-  },
-  {
-    id: 10,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-72.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: true,
-  },
-  {
-    id: 11,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/New-Balnce-1.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: false,
-  },
-  {
-    id: 12,
-    name: 'Nike Air Max 270',
-    brand: 'Nike',
-    imageSrc: 'src/assets/images/shoe-2.png',
-    imageAlt: 'Nike Air Max 270 sneakers in white and red',
-    price: '$120',
-    originalPrice: '$150',
-    color: 'White/University Red',
-    onSale: false,
-  },
-];
+import axios from "axios";
+import { onMounted, ref } from "vue";
+
+const products = ref([]);
+const imageUrl = import.meta.env.VITE_APP_Image_Url;
+
+const fetchProducts = async () => {
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  try {
+    const response = await axios.get(apiUrl + "products", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    products.value = response.data.map((product) => {
+      if (typeof product.colors === "string") {
+        try {
+          product.colors = JSON.parse(product.colors);
+        } catch {
+          product.colors = [];
+        }
+      }
+      return product;
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(fetchProducts);
 </script>

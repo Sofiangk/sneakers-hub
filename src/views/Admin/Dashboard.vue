@@ -313,16 +313,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const sneaker = ref({
-  name: '',
-  brand: '',
-  price: '',
+  name: "",
+  brand: "",
+  price: "",
   onSale: false,
   colors: [],
   sizes: [],
-  imageSrc: '',
+  imageSrc: "",
 });
 
 const uploadImage = (event) => {
@@ -336,14 +336,14 @@ const uploadImage = (event) => {
   reader.readAsDataURL(file);
 };
 
-const addColor = () => sneaker.value.colors.push({ name: '' });
+const addColor = () => sneaker.value.colors.push({ name: "" });
 const removeColor = (index) => sneaker.value.colors.splice(index, 1);
 
-const addSize = () => sneaker.value.sizes.push({ name: '', inStock: false });
+const addSize = () => sneaker.value.sizes.push({ name: "", inStock: false });
 const removeSize = (index) => sneaker.value.sizes.splice(index, 1);
 
 const addSneaker = () => {
-  console.log('New Sneaker:', sneaker.value);
-  alert('Sneaker added successfully!');
+  console.log("New Sneaker:", sneaker.value);
+  alert("Sneaker added successfully!");
 };
 </script>

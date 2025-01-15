@@ -48,7 +48,8 @@
                 d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
               />
             </svg>
-            <p>{{ username }}</p>
+            <p v-if="authStore.isAuthenticated">{{ authStore.name }}</p>
+            <p v-else @click="router.push('/login')">Login</p>
           </button>
           <!-- Dropdown Menu -->
           <div
@@ -58,6 +59,7 @@
             <ul>
               <li>
                 <router-link
+                  v-if="authStore.role === 'admin'"
                   to="/dashboard"
                   class="block px-4 py-3 text-sm hover:bg-gray-200"
                 >
@@ -69,7 +71,7 @@
                   to="/login"
                   class="block px-4 py-3 text-sm hover:bg-gray-200"
                 >
-                  Login
+                  {{ authStore.isAuthenticated ? "Logout" : "Login" }}
                 </router-link>
               </li>
             </ul>
@@ -77,7 +79,10 @@
         </div>
 
         <!-- cart -->
-        <div class="relative hidden md:flex items-center mt-auto p-4">
+        <div
+          class="relative hidden md:flex items-center mt-auto p-4"
+          v-if="authStore.isAuthenticated && authStore.role !== 'admin'"
+        >
           <button
             @click="toggleDropdownCart"
             class="text-navy-lighter focus:outline-none px-2 flex items-center space-x-2"
@@ -149,8 +154,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import Cart from './Cart.vue';
+import { ref } from "vue";
+import Cart from "./Cart.vue";
+import { useAuthStore } from "@/stores/counter";
+import router from "@/router";
+const authStore = useAuthStore();
 
 const cartCount = ref(0);
 
@@ -172,7 +180,7 @@ const toggleDropdownCart = () => {
   isDropdownOpenCart.value = !isDropdownOpenCart.value;
 };
 
-const username = ref('Yahya Big E');
+const username = ref("Yahya Big E");
 </script>
 
 <style scoped>
