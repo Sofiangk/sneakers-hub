@@ -30,7 +30,7 @@
             </div>
           </div>
           <img
-            :src="imageUrl + product.image"
+            :src="imageUrl + product.images"
             :alt="product.imageAlt"
             class="aspect-square w-full p-12 rounded-md bg-gray-200 object-contain group-hover:opacity-75 lg:aspect-auto lg:h-80"
           />
@@ -44,26 +44,31 @@
                 </router-link>
               </h3>
               <p class="mt-1 text-sm text-gray-500">{{ product.brand }}</p>
-              <div
-                class="flex w-full text-sm"
-                v-for="color in product.colors"
-                :key="color"
-              >
-                <p class="flex items-center">{{ color }}</p>
+              <div class="flex flex-wrap gap-4 text-sm">
+                <div
+                  class="flex items-center bg-gray-200 p-2 rounded mt-4"
+                  v-for="color in product.colors"
+                  :key="color"
+                >
+                  <p>{{ color.name }}</p>
+                </div>
               </div>
             </div>
             <div class="text-right">
               <p
-                v-if="product.onSale"
-                class="text-xs text-gray-500 line-through"
-              >
-                {{ product.originalPrice }} $
-              </p>
-              <p
-                class="text-sm font-medium"
-                :class="product.onSale ? 'text-red-600' : 'text-gray-900'"
+                :class="
+                  product.price_after_discount > 0
+                    ? 'text-red-500 line-through'
+                    : ''
+                "
               >
                 {{ product.price }} $
+              </p>
+              <p
+                class="text-sm text-gray-500"
+                v-if="product.price_after_discount > 0"
+              >
+                {{ product.price_after_discount }} $
               </p>
             </div>
           </div>

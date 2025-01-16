@@ -30,7 +30,7 @@
               :to="product.href"
               aria-current="page"
               class="font-medium text-gray-500 hover:text-gray-600"
-              >{{ product.name }}</router-link
+              >{{ name }}</router-link
             >
           </li>
         </ol>
@@ -41,17 +41,25 @@
         class="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8 max-h-screen"
       >
         <img
-          :src="product.images[0].src"
-          :alt="product.images[0].alt"
-          class="object-contain w-full px-40 hidden size-full rounded-lg col-span-2 lg:block"
+          v-for="(image, index) in images"
+          :key="index"
+          :src="imgUrl + image"
+          alt=""
         />
+
         <div class="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
           <!-- Options -->
           <div class="mt-4 lg:row-span-3 lg:mt-0">
             <h2 class="sr-only">Product information</h2>
-            <p class="text-3xl tracking-tight text-gray-900">
-              {{ product.price }}
+            <p
+              class="text-3xl tracking-tight text-gray-900"
+              :class="
+                price_after_discount > 0 ? 'line-through text-red-500' : ''
+              "
+            >
+              {{ price }} $
             </p>
+            <p v-if="price_after_discount > 0">{{ price_after_discount }} $</p>
 
             <!-- Reviews -->
             <div class="mt-6">
@@ -91,7 +99,7 @@
                   >
                     <RadioGroupOption
                       as="template"
-                      v-for="color in product.colors"
+                      v-for="color in colors"
                       :key="color.name"
                       :value="color"
                       :aria-label="color.name"
@@ -136,7 +144,7 @@
                   >
                     <RadioGroupOption
                       as="template"
-                      v-for="size in product.sizes"
+                      v-for="size in sizes"
                       :key="size.name"
                       :value="size"
                       :disabled="!size.inStock"
@@ -201,7 +209,7 @@
           <h1
             class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl"
           >
-            {{ product.name }}
+            {{ name }}
           </h1>
         </div>
 
@@ -215,7 +223,7 @@
             <h3 class="sr-only">Description</h3>
 
             <div class="space-y-6">
-              <p class="text-base text-gray-900">{{ product.description }}</p>
+              <p class="text-base text-gray-900">{{ description }}</p>
             </div>
           </div>
 
@@ -249,77 +257,59 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { StarIcon } from '@heroicons/vue/20/solid';
-import { RadioGroup, RadioGroupOption } from '@headlessui/vue';
-
+import { onMounted, ref } from "vue";
+import { StarIcon } from "@heroicons/vue/20/solid";
+import { RadioGroup, RadioGroupOption } from "@headlessui/vue";
+import router from "@/router";
+import axios from "axios";
+const imgUrl = import.meta.env.VITE_APP_Image_Url;
+const name = ref("");
+const price = ref(0);
+const images = ref([]);
+const colors = ref([]);
+const sizes = ref([]);
+const brand = ref("");
+const description = ref("");
+const price_after_discount = ref(0);
+const id = router.currentRoute.value.params.id;
 const product = {
-  name: 'Nike Air Max 270',
-  price: '$150',
-  href: '#',
+  href: "#",
   breadcrumbs: [
-    { id: 1, name: 'Home', href: '/' },
-    { id: 2, name: 'Sneakers', href: '/sneakers' },
+    { id: 1, name: "Home", href: "/" },
+    { id: 2, name: "Sneakers", href: "/sneakers" },
   ],
-  images: [
-    {
-      src: '/src/assets/images/shoe-8.png',
-      alt: 'Side profile of Nike Air Max 270 sneaker in white and red.',
-    },
-    {
-      src: '/src/assets/images/shoe-2.png',
-      alt: 'Front view of Nike Air Max 270 sneaker.',
-    },
-    {
-      src: '/src/assets/images/shoe-3.png',
-      alt: 'Back view of Nike Air Max 270 sneaker.',
-    },
-    {
-      src: '/src/assets/images/shoe-4.png',
-      alt: 'Top view of Nike Air Max 270 sneaker.',
-    },
-  ],
-  colors: [
-    {
-      name: 'White/University Red',
-      class: 'bg-white',
-      selectedClass: 'ring-gray-400',
-    },
-    {
-      name: 'Black/Anthracite',
-      class: 'bg-gray-900',
-      selectedClass: 'ring-gray-900',
-    },
-    {
-      name: 'Wolf Grey/White',
-      class: 'bg-gray-400',
-      selectedClass: 'ring-gray-400',
-    },
-  ],
-  sizes: [
-    { name: '38', inStock: true },
-    { name: '39', inStock: true },
-    { name: '40', inStock: true },
-    { name: '41', inStock: true },
-    { name: '42', inStock: false },
-    { name: '43', inStock: true },
-    { name: '44', inStock: true },
-    { name: '45', inStock: false },
-  ],
-  description:
-    "The Nike Air Max 270 combines the exaggerated tongue from the Air Max 180 and classic elements from the Air Max 93. It features Nike's biggest heel Air unit yet for a super-soft ride that feels as impossible as it looks.",
+
   highlights: [
-    'Mesh and synthetic upper for lightweight breathability',
-    'Dual-density foam midsole for cushioning',
-    'Max Air 270 unit delivers unrivaled, all-day comfort',
-    'Rubber outsole for durable traction',
+    "Mesh and synthetic upper for lightweight breathability",
+    "Dual-density foam midsole for cushioning",
+    "Max Air 270 unit delivers unrivaled, all-day comfort",
+    "Rubber outsole for durable traction",
   ],
   details:
     "The Nike Air Max 270 is the first Air Max designed specifically for all-day comfort. The shoe's design is inspired by the Air Max 93 and 180, and it features Nike's largest heel Air unit yet at 32-mm tall. The result is a shoe that's perfect for all-day wear, whether you're running errands or hitting the town.",
 };
 
-const reviews = { href: '#', average: 4.5, totalCount: 1875 };
+const reviews = { href: "#", average: 4.5, totalCount: 1875 };
 
-const selectedColor = ref(product.colors[0]);
-const selectedSize = ref(product.sizes[4]);
+const selectedColor = ref(colors);
+const selectedSize = ref(sizes);
+const fetchProduct = async () => {
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  try {
+    const response = await axios.get(apiUrl + "products/" + id);
+    const productData = response.data; // Adjust based on the API response structure
+    name.value = productData.name;
+    price.value = productData.price;
+    images.value = productData.images;
+    colors.value = productData.colors;
+    sizes.value = productData.sizes;
+    brand.value = productData.brand;
+    description.value = productData.description;
+    price_after_discount.value = productData.price_after_discount;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+  }
+};
+
+onMounted(() => fetchProduct());
 </script>

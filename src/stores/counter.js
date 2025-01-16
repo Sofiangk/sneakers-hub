@@ -95,14 +95,15 @@ export const useAuthStore = defineStore("auth", {
         }
 
         const response = await axios.post(
-          apiUrl + "logout",
+          "http://127.0.0.1:8000/api/logout",
           {},
           {
             headers: {
-              Authorization: `Bearer ${this.token}`,
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
+        console.log(localStorage.getItem("token"));
 
         if (response.status === 200) {
           window.alert("تم تسجيل الخروج بنجاح");

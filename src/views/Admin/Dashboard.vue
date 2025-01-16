@@ -1,7 +1,7 @@
 <template>
   <div class="p-8 bg-gray-100 min-h-screen">
     <h1 class="text-3xl font-bold mb-8 text-center">Add New Sneaker</h1>
-    <form submit.prevent="addSneaker">
+    <form @submit.prevent="addSneaker">
       <div class="space-y-12 max-w-3xl mx-auto">
         <div class="border-b border-gray-900/10 pb-12">
           <h2 class="text-base font-semibold text-gray-900">Product Details</h2>
@@ -18,6 +18,7 @@
               >
               <div class="mt-2">
                 <input
+                  v-model="sneaker.name"
                   type="text"
                   name="product-name"
                   id="product-name"
@@ -34,6 +35,7 @@
                 <select
                   id="brand"
                   name="brand"
+                  v-model="sneaker.brand"
                   class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3"
                 >
                   <option value="adidas">Adidas</option>
@@ -54,6 +56,7 @@
               >
               <div class="mt-2">
                 <textarea
+                  v-model="sneaker.description"
                   id="description"
                   name="description"
                   rows="4"
@@ -270,6 +273,7 @@
                     type="number"
                     name="price"
                     id="price"
+                    v-model="sneaker.price"
                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3"
                   />
                 </div>
@@ -284,6 +288,7 @@
                 >
                 <div class="mt-2">
                   <input
+                    v-model="sneaker.discountedPrice"
                     type="number"
                     name="discounted-price"
                     id="discounted-price"
@@ -314,36 +319,82 @@
 
 <script setup>
 import { ref } from "vue";
+import axios from "axios";
 
+// Reactive state for the sneaker data
 const sneaker = ref({
   name: "",
   brand: "",
-  price: "",
+  description: "",
+  image: null,
+  imageSrc: null, // For preview
+  colors: [{ name: "", hex: "" }],
+  sizes: [{ name: "", inStock: false }],
   onSale: false,
-  colors: [],
-  sizes: [],
-  imageSrc: "",
+  price: 0,
+  discountedPrice: 0,
 });
 
-const uploadImage = (event) => {
+// Methods
+const uploadImage = async (event) => {
   const file = event.target.files[0];
-  const reader = new FileReader();
+  if (file) {
+    sneaker.value.image = file;
 
-  reader.onload = (e) => {
-    sneaker.value.imageSrc = e.target.result;
-  };
-
-  reader.readAsDataURL(file);
+    // Preview Image
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      sneaker.value.imageSrc = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 };
 
-const addColor = () => sneaker.value.colors.push({ name: "" });
-const removeColor = (index) => sneaker.value.colors.splice(index, 1);
+const addColor = () => {
+  sneaker.value.colors.push({ name: "", hex: "" });
+};
 
-const addSize = () => sneaker.value.sizes.push({ name: "", inStock: false });
-const removeSize = (index) => sneaker.value.sizes.splice(index, 1);
+const removeColor = (index) => {
+  sneaker.value.colors.splice(index, 1);
+};
 
-const addSneaker = () => {
-  console.log("New Sneaker:", sneaker.value);
-  alert("Sneaker added successfully!");
+const addSize = () => {
+  sneaker.value.sizes.push({ name: "", inStock: false });
+};
+
+const removeSize = (index) => {
+  sneaker.value.sizes.splice(index, 1);
+};
+
+const addSneaker = async () => {
+  try {
+    // Replace `YOUR_API_ENDPOINT` with your backend URL
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/products",
+      {
+        name: "Adidas",
+        brand: sneaker.value.brand,
+        description: sneaker.value.description,
+        image: sneaker.value.image,
+        colors: sneaker.value.colors,
+        price: sneaker.value.price,
+        sizes: sneaker.value.sizes,
+        images: [sneaker.value.image],
+        price_after_discount: sneaker.value.discountedPrice,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    alert("Sneaker added successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to add sneaker.");
+  }
 };
 </script>
