@@ -297,7 +297,7 @@ const fetchProduct = async () => {
   const apiUrl = import.meta.env.VITE_APP_API_URL;
   try {
     const response = await axios.get(apiUrl + "products/" + id);
-    const productData = response.data; // Adjust based on the API response structure
+    const productData = response.data;
     name.value = productData.name;
     price.value = productData.price;
     images.value = productData.images;
